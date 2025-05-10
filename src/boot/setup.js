@@ -1,4 +1,20 @@
 const express = require('express')
+const dotenv = require('dotenv')
+const fs = require('fs')
+const path = require('path')
+
+// Load environment-specific .env file
+const env = process.env.NODE_ENV || 'dev'
+const envFile = `.env.${env}`
+const envPath = path.resolve(__dirname, '..', envFile)
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath })
+  console.log(`✅ Loaded environment config from ${envFile}`)
+} else {
+  console.warn(`⚠️ No env file found for ${env} (${envFile})`)
+}
+
 const PORT = process.env.PORT || 8080
 const app = express()
 
@@ -22,20 +38,23 @@ const moviesRoutes = require('../routes/movies.routes')
 const ratingRoutes = require('../routes/rating.routes')
 const commentsRoutes = require('../routes/comments.routes')
 
+// Connect to MongoDB from env variable
 try {
-  mongoose.connect('mongodb://localhost:27017/epita')
+  mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   logger.info('MongoDB Connected')
 } catch (error) {
-  logger.error('Error connecting to DB' + error)
+  logger.error('Error connecting to MongoDB: ' + error)
 }
 
 // MIDDLEWARE
 const registerCoreMiddleWare = () => {
   try {
-    // using our session
     app.use(
       session({
-        secret: '1234',
+        secret: process.env.SESSION_SECRET || '1234',
         resave: false,
         saveUninitialized: true,
         cookie: {
@@ -46,58 +65,49 @@ const registerCoreMiddleWare = () => {
     )
 
     app.use(morgan('combined', { stream: logger.stream }))
-    app.use(express.json()) // returning middleware that only parses Json
-    app.use(cors({})) // enabling CORS
-    app.use(helmet()) // enabling helmet -> setting response headers
+    app.use(express.json())
+    app.use(cors({}))
+    app.use(helmet())
 
     app.use(validator)
     app.use(healthCheck)
 
     app.use('/auth', authRoutes)
     app.use('/users', usersRoutes)
-
-    // Route registration
     app.use('/messages', verifyToken, messageRoutes)
     app.use('/profile', verifyToken, profileRoutes)
     app.use('/movies', verifyToken, moviesRoutes)
     app.use('/ratings', verifyToken, ratingRoutes)
     app.use('/comments', verifyToken, commentsRoutes)
 
-    // 404 handling for not found
     app.use(notFound)
-
     logger.http('Done registering all middlewares')
   } catch (err) {
-    logger.error('Error thrown while executing registerCoreMiddleWare')
+    logger.error('Error in registerCoreMiddleWare: ' + err)
     process.exit(1)
   }
 }
 
 // handling uncaught exceptions
 const handleError = () => {
-  // 'process' is a built it object in nodejs
-  // if uncaught exceptoin, then we execute this
-  //
   process.on('uncaughtException', (err) => {
-    logger.error(`UNCAUGHT_EXCEPTION OCCURED : ${JSON.stringify(err.stack)}`)
+    logger.error(`UNCAUGHT_EXCEPTION: ${JSON.stringify(err.stack)}`)
   })
 }
 
-// start applicatoin
+// start application
 const startApp = () => {
   try {
-    // register core application level middleware
     registerCoreMiddleWare()
 
     app.listen(PORT, () => {
       logger.info('Listening on 127.0.0.1:' + PORT)
     })
 
-    // exit on uncaught exception
     handleError()
   } catch (err) {
     logger.error(
-      `startup :: Error while booting the applicaiton ${JSON.stringify(err, undefined, 2)}`
+      `startup :: Error while booting the application ${JSON.stringify(err, null, 2)}`
     )
     throw err
   }
