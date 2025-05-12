@@ -5,14 +5,14 @@ import logger from './winston';
 
 interface CustomRequest extends Request {
   user?: {
-    id?: string;
+    _id: string; // corrected from id to _id
     email: string;
   };
 }
 
 interface DecodedToken {
   user: {
-    id: string;
+    _id: string;
     email: string;
   };
   iat: number;
@@ -37,14 +37,14 @@ export const verifyToken = (req: CustomRequest, res: Response, next: NextFunctio
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY || '') as DecodedToken;
-    
-    if (!decoded.user || !decoded.user.email) {
+
+    if (!decoded.user || !decoded.user.email || !decoded.user._id) {
       res.status(statusCodes.unauthorized).json({ error: 'Invalid token payload' });
       return;
     }
 
     req.user = {
-      id: decoded.user.id,
+      _id: decoded.user._id,
       email: decoded.user.email,
     };
     next();
@@ -60,4 +60,4 @@ export const verifyToken = (req: CustomRequest, res: Response, next: NextFunctio
   }
 };
 
-export default verifyToken
+export default verifyToken;
