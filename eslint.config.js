@@ -19,9 +19,18 @@ export default [
       },
     },
     rules: {
-      'no-unused-vars': 'warn',
-      'no-console': 'off',
-      'no-undef': 'off',
+      '@typescript-eslint/interface-name-prefix': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'error',
+      'no-console': 'warn',
+      'no-restricted-syntax': [
+        'error',
+        'ForInStatement',
+        'LabeledStatement',
+        'WithStatement',
+      ],
     },
   },
 ]

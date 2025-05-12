@@ -1,0 +1,16 @@
+import { Router } from 'express';
+import {
+  addMessage,
+  getMessages,
+  editMessage,
+  deleteMessage,
+  getMessageById
+} from '../controllers/messages.controller';
+
+export const router = Router();
+
+router.post('/add/message', addMessage);
+router.get('/', getMessages);
+router.put('/edit/:messageId', editMessage);
+router.delete('/delete/:messageId', deleteMessage);
+router.get('/:messageId', getMessageById);
