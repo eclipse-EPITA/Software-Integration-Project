@@ -1,8 +1,8 @@
-import { Router } from 'express'
-import { addRating } from '../controllers/rating.controller'
+import { Router } from 'express';
+import { addRating } from '../controllers/rating.controller';
 
-const router = Router()
+const ratingRouter = Router();
 
-router.post('/:movieId', addRating)
+ratingRouter.post('/:movieId', addRating);
 
-export default router
+export { ratingRouter as router };

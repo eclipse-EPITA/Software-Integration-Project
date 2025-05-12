@@ -7,12 +7,10 @@ import {
   getMessageById
 } from '../controllers/messages.controller';
 
-const router = Router();
+export const router = Router();
 
 router.post('/add/message', addMessage);
 router.get('/', getMessages);
 router.put('/edit/:messageId', editMessage);
 router.delete('/delete/:messageId', deleteMessage);
 router.get('/:messageId', getMessageById);
-
-export default router; 

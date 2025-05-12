@@ -13,13 +13,14 @@ import verifyToken from '../middleware/authentication';
 import validator from '../middleware/validator';
 
 // ROUTES
-import authRoutes from '../routes/auth.routes';
-import messageRoutes from '../routes/messages.routes';
-import usersRoutes from '../routes/users.routes';
-import profileRoutes from '../routes/profile.routes';
-import moviesRoutes from '../routes/movies.routes';
-import ratingRoutes from '../routes/rating.routes';
-import commentsRoutes from '../routes/comments.routes';
+import { router as authRoutes } from '../routes/auth.routes';
+import { router as messageRoutes } from '../routes/messages.routes';
+import { router as usersRoutes } from '../routes/users.routes';
+import { router as profileRoutes } from '../routes/profile.routes';
+import { router as moviesRoutes } from '../routes/movies.routes';
+import { router as ratingRoutes } from '../routes/rating.routes';
+import { router as commentsRoutes } from '../routes/comments.routes';
+
 
 const PORT = process.env.PORT || 8080;
 const MONGO_URI = process.env.MONGO_URI;
